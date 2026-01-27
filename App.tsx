@@ -10,6 +10,7 @@ import SegmentoChart from './components/SegmentoChart';
 import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 import { pingSupabase, Participante, listarParticipantes } from './services/feiraParticipanteService';
 import ParticipantsView from './components/ParticipantsView';
+import DataManagementView from './components/DataManagementView';
 
 const App: React.FC = () => {
   const [events, setEvents] = useState<Evento[]>(EVENTOS_DATA);
@@ -153,6 +154,23 @@ const App: React.FC = () => {
       setEvents(prev => [...prev, eventToAdd]);
       setIsAddModalOpen(false);
     }
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!confirm("Tem certeza que deseja excluir este evento?")) return;
+
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('eventos').delete().eq('id', eventId);
+      if (error) {
+        console.error("Error deleting event:", error);
+        alert("Erro ao excluir evento.");
+        return;
+      }
+    }
+
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+    setSelectedEvent(null);
+    setIsEditMode(false);
   };
 
   const addParticipant = async (eventId: string, name: string) => {
@@ -351,6 +369,10 @@ const App: React.FC = () => {
             {view === ViewMode.PARTICIPANTS && (
               <ParticipantsView />
             )}
+
+            {view === ViewMode.DATA_MANAGEMENT && (
+              <DataManagementView />
+            )}
           </>
         )}
       </main >
@@ -534,6 +556,13 @@ const App: React.FC = () => {
                   >
                     Visitar Site Oficial
                   </a>
+                  <button
+                    onClick={() => handleDeleteEvent(selectedEvent.id)}
+                    className="flex-none px-4 bg-red-50 text-red-500 border border-red-100 rounded-2xl font-bold hover:bg-red-100 transition-all"
+                    title="Excluir Evento"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
                   <button
                     onClick={() => setSelectedEvent(null)}
                     className="flex-1 border border-slate-200 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-50 transition-all"
