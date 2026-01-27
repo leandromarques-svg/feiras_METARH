@@ -432,7 +432,7 @@ const App: React.FC = () => {
             )}
 
             {view === ViewMode.STATS && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                   <h3 className="text-lg font-bold mb-6 text-slate-800">Eventos por Mês</h3>
                   <div className="h-64">
@@ -448,11 +448,32 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-
-
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="text-lg font-bold mb-6 text-slate-800">Motivos de Participação</h3>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={(() => {
+                        const intencoes: Record<string, number> = {};
+                        events.forEach(e => {
+                          e.interessados?.forEach(i => {
+                            intencoes[i.intencao] = (intencoes[i.intencao] || 0) + 1;
+                          });
+                        });
+                        return Object.entries(intencoes).map(([name, value]) => ({ name, value }));
+                      })()}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" angle={-15} textAnchor="end" height={80} />
+                        <YAxis allowDecimals={false} />
+                        <Tooltip cursor={{ fill: '#f5f3ff' }} />
+                        <Bar dataKey="value" fill="#06b6d4" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
                   <h3 className="text-lg font-bold mb-6 text-slate-800">Ranking do Time</h3>
-                  <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {interessados.map(nome => {
                       const count = events.filter(e => e.interessados && e.interessados.some(i => i.nome === nome)).length;
                       const percentage = (count / (events.length || 1)) * 100;
