@@ -196,7 +196,12 @@ const App: React.FC = () => {
     const newInteressados = [...(event.interessados || []), newInteressado];
 
     if (isSupabaseConfigured && supabase) {
-      await supabase.from('eventos').update({ interessados: newInteressados }).eq('id', eventId);
+      const { error } = await supabase.from('eventos').update({ interessados: newInteressados }).eq('id', eventId);
+      if (error) {
+        console.error("Erro ao atualizar participantes:", error);
+        alert("Erro ao salvar responsável: " + error.message);
+        return;
+      }
     }
 
     setEvents(prev => prev.map(e => e.id === eventId ? { ...e, interessados: newInteressados } : e));

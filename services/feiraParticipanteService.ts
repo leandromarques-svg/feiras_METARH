@@ -56,15 +56,19 @@ export const listarParticipantes = async () => {
 };
 
 export const adicionarParticipante = async (nome: string, area: string = '') => {
-  const { data, error } = await supabase.from('participantes').insert([{ nome, area }]).select();
+  // Note: 'area' is kept in the interface for UI purposes but not stored in DB yet
+  // Only send 'nome' to Supabase until the column is added to the database
+  const { data, error } = await supabase.from('participantes').insert([{ nome }]).select();
   if (error) throw error;
-  return data?.[0];
+  // Return with area for local state management
+  return data?.[0] ? { ...data[0], area } : data?.[0];
 };
 
 export const atualizarParticipante = async (id: string, nome: string, area: string) => {
-  const { data, error } = await supabase.from('participantes').update({ nome, area }).eq('id', id).select();
+  // Only update 'nome' in DB until 'area' column is added
+  const { data, error } = await supabase.from('participantes').update({ nome }).eq('id', id).select();
   if (error) throw error;
-  return data?.[0];
+  return data?.[0] ? { ...data[0], area } : data?.[0];
 };
 
 export const deletarParticipante = async (id: string) => {
