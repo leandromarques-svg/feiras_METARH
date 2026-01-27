@@ -32,17 +32,27 @@ const DataManagementView: React.FC = () => {
 
     const processData = async (rawData: any[]) => {
         // Mapeamento inteligente
-        const validItems = rawData.map(item => ({
-            nome: item.nome || item.Evento || item.evento,
-            sobre: item.sobre || item.Sobre || '',
-            segmento: item.segmento || item.Segmento || 'Geral',
-            local: item.local || item.Local || 'A definir',
-            site: item.site || item['Site do Evento'] || item.site_do_evento || '',
-            mes: item.mes || item['Mês'] || item.mes || '1 - janeiro',
-            dia: item.dia || item.Dia || item.dia ? String(item.dia || item.Dia) : '01',
-            ano: item.ano || item.Ano || item.ano ? String(item.ano || item.Ano) : '2026',
-            interessados: Array.isArray(item.interessados) ? item.interessados : []
-        })).filter(item => item.nome);
+        const validItems = rawData.map(item => {
+            let interessados = [];
+            if (Array.isArray(item.interessados)) {
+                interessados = item.interessados.map((i: any) => {
+                    if (typeof i === 'string') return { nome: i, intencao: 'Outros' };
+                    return i; // Assume object
+                });
+            }
+
+            return {
+                nome: item.nome || item.Evento || item.evento,
+                sobre: item.sobre || item.Sobre || '',
+                segmento: item.segmento || item.Segmento || 'Geral',
+                local: item.local || item.Local || 'A definir',
+                site: item.site || item['Site do Evento'] || item.site_do_evento || '',
+                mes: item.mes || item['Mês'] || item.mes || '1 - janeiro',
+                dia: item.dia || item.Dia || item.dia ? String(item.dia || item.Dia) : '01',
+                ano: item.ano || item.Ano || item.ano ? String(item.ano || item.Ano) : '2026',
+                interessados: interessados
+            };
+        }).filter(item => item.nome);
 
         if (validItems.length === 0) {
             throw new Error("Nenhum evento válido encontrado.");

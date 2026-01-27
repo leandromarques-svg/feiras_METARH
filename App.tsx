@@ -24,7 +24,12 @@ const App: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [newParticipantName, setNewParticipantName] = useState('');
+  const [newIntention, setNewIntention] = useState('');
   const [allParticipants, setAllParticipants] = useState<Participante[]>([]);
+
+  // Selection Mode State
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   // Form State
   const [formEvent, setFormEvent] = useState<Partial<Evento>>({
@@ -79,7 +84,7 @@ const App: React.FC = () => {
   const segmentos = useMemo(() => Array.from(new Set(events.map(e => e.segmento))), [events]);
   const meses = useMemo(() => Array.from(new Set(events.map(e => e.mes))).sort(), [events]);
   const interessados = useMemo(() => {
-    const all = events.flatMap(e => e.interessados || []);
+    const all = events.flatMap(e => e.interessados?.map(i => i.nome) || []);
     return Array.from(new Set(all));
   }, [events]);
 
@@ -89,7 +94,7 @@ const App: React.FC = () => {
         e.sobre.toLowerCase().includes(filters.search.toLowerCase());
       const matchSegmento = !filters.segmento || e.segmento === filters.segmento;
       const matchMes = !filters.mes || e.mes === filters.mes;
-      const matchInteressado = !filters.interessado || (e.interessados && e.interessados.includes(filters.interessado));
+      const matchInteressado = !filters.interessado || (e.interessados && e.interessados.some(i => i.nome === filters.interessado));
       return matchSearch && matchSegmento && matchMes && matchInteressado;
     });
   }, [filters, events]);
@@ -103,13 +108,19 @@ const App: React.FC = () => {
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [events]);
 
-  const segmentoData = useMemo(() => {
+  const segmentoData = useMemo(() => { // Keep this for future if used
     const counts: Record<string, number> = {};
     events.forEach(e => {
       counts[e.segmento] = (counts[e.segmento] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [events]);
+
+  // Ranking data update
+  // We need to fix the Ranking do Time section in render if it relies on string inclusion which logic changed.
+  // I will check the usage below in render. It uses `events.filter(e => e.interessados && e.interessados.includes(nome))`.
+  // I need to update that too. I'll do it in this chunk if I can reach. I can't reach render here.
+  // I'll update these memos first.
 
   const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -173,13 +184,16 @@ const App: React.FC = () => {
     setIsEditMode(false);
   };
 
-  const addParticipant = async (eventId: string, name: string) => {
-    if (!name.trim()) return;
+  const addParticipant = async (eventId: string, name: string, intencao: string) => {
+    if (!name.trim() || !intencao) return;
     const event = events.find(e => e.id === eventId);
     if (!event) return;
 
-    const newInteressados = [...(event.interessados || []), name];
-    if (event.interessados?.includes(name)) return;
+    const newInteressado = { nome: name, intencao };
+    // Check if already exists by name
+    if (event.interessados?.some(i => i.nome === name)) return;
+
+    const newInteressados = [...(event.interessados || []), newInteressado];
 
     if (isSupabaseConfigured && supabase) {
       await supabase.from('eventos').update({ interessados: newInteressados }).eq('id', eventId);
@@ -194,7 +208,7 @@ const App: React.FC = () => {
     const event = events.find(e => e.id === eventId);
     if (!event) return;
 
-    const newInteressados = (event.interessados || []).filter(n => n !== name);
+    const newInteressados = (event.interessados || []).filter(i => i.nome !== name);
     if (isSupabaseConfigured && supabase) {
       await supabase.from('eventos').update({ interessados: newInteressados }).eq('id', eventId);
     }
@@ -208,6 +222,43 @@ const App: React.FC = () => {
       setFormEvent(selectedEvent);
       setIsEditMode(true);
     }
+  };
+
+  const toggleSelectionMode = () => {
+    setIsSelectionMode(!isSelectionMode);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelectEvent = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Tem certeza que deseja excluir ${selectedIds.size} eventos selecionados?`)) return;
+
+    setLoading(true);
+    if (isSupabaseConfigured && supabase) {
+      const idsToDelete = Array.from(selectedIds);
+      const { error } = await supabase.from('eventos').delete().in('id', idsToDelete);
+
+      if (error) {
+        console.error("Erro ao excluir eventos:", error);
+        alert("Erro ao excluir eventos selecionados.");
+      } else {
+        setEvents(prev => prev.filter(e => !selectedIds.has(e.id)));
+      }
+    }
+
+    setSelectedIds(new Set());
+    setIsSelectionMode(false);
+    setLoading(false);
   };
 
   return (
@@ -238,6 +289,19 @@ const App: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
+
+            {view === ViewMode.GRID && (
+              <button
+                onClick={toggleSelectionMode}
+                className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm border ${isSelectionMode
+                  ? 'bg-slate-200 text-slate-700 border-slate-300'
+                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  }`}
+              >
+                {isSelectionMode ? 'Cancelar Seleção' : 'Selecionar'}
+              </button>
+            )}
+
             <button
               onClick={() => { setIsEditMode(false); setFormEvent({ nome: '', sobre: '', segmento: '', local: '', site: '', mes: '1 - janeiro', dia: '', ano: '2026', interessados: [] }); setIsAddModalOpen(true); }}
               className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-purple-200 flex items-center gap-2"
@@ -287,7 +351,14 @@ const App: React.FC = () => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredEvents.map(evento => (
-                    <EventCard key={evento.id} evento={evento} onClick={setSelectedEvent} />
+                    <EventCard
+                      key={evento.id}
+                      evento={evento}
+                      onClick={setSelectedEvent}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={selectedIds.has(evento.id)}
+                      onToggleSelect={toggleSelectEvent}
+                    />
                   ))}
                 </div>
               </>
@@ -347,7 +418,7 @@ const App: React.FC = () => {
                   <h3 className="text-lg font-bold mb-6 text-slate-800">Ranking do Time</h3>
                   <div className="space-y-5">
                     {interessados.map(nome => {
-                      const count = events.filter(e => e.interessados && e.interessados.includes(nome)).length;
+                      const count = events.filter(e => e.interessados && e.interessados.some(i => i.nome === nome)).length;
                       const percentage = (count / (events.length || 1)) * 100;
                       return (
                         <div key={nome}>
@@ -376,6 +447,21 @@ const App: React.FC = () => {
           </>
         )}
       </main >
+
+      {/* Floating Action Bar for Bulk Delete */}
+      {selectedIds.size > 0 && isSelectionMode && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-2xl border border-slate-200 z-50 flex items-center gap-4 animate-in slide-in-from-bottom-4">
+          <span className="font-bold text-slate-700">{selectedIds.size} selecionado(s)</span>
+          <div className="h-6 w-px bg-slate-200"></div>
+          <button
+            onClick={handleBulkDelete}
+            className="flex items-center gap-2 text-red-500 font-bold hover:text-red-600 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Excluir
+          </button>
+        </div>
+      )}
 
       {/* Modal Cadastro/Edição */}
       {
@@ -516,31 +602,46 @@ const App: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="flex gap-2">
-                        <select
-                          className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
-                          value={newParticipantName}
-                          onChange={e => setNewParticipantName(e.target.value)}
-                        >
-                          <option value="">Selecione um integrante...</option>
-                          {allParticipants
-                            .filter(p => !selectedEvent.interessados?.includes(p.nome))
-                            .map(p => (
-                              <option key={p.id} value={p.nome}>{p.nome}</option>
-                            ))
-                          }
-                        </select>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex gap-2">
+                          <select
+                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
+                            value={newParticipantName}
+                            onChange={e => setNewParticipantName(e.target.value)}
+                          >
+                            <option value="">Selecione um integrante...</option>
+                            {allParticipants
+                              .filter(p => !selectedEvent.interessados?.some(i => i.nome === p.nome))
+                              .map(p => (
+                                <option key={p.id} value={p.nome}>{p.nome}</option>
+                              ))
+                            }
+                          </select>
+                          <select
+                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
+                            value={newIntention}
+                            onChange={e => setNewIntention(e.target.value)}
+                          >
+                            <option value="">Intenção...</option>
+                            <option value="Visita a Cliente Ativo">Visita a Cliente Ativo</option>
+                            <option value="Prospecção">Prospecção</option>
+                            <option value="PDI">PDI</option>
+                            <option value="Network">Network</option>
+                            <option value="Outros">Outros</option>
+                          </select>
+                        </div>
                         <button
                           onClick={() => {
-                            if (newParticipantName) {
-                              addParticipant(selectedEvent.id, newParticipantName);
+                            if (newParticipantName && newIntention) {
+                              addParticipant(selectedEvent.id, newParticipantName, newIntention);
                               setNewParticipantName('');
+                              setNewIntention('');
                             }
                           }}
-                          disabled={!newParticipantName}
-                          className="px-6 py-3 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!newParticipantName || !newIntention}
+                          className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Incluir
+                          Incluir Responsável
                         </button>
                       </div>
                     </div>

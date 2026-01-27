@@ -55,7 +55,11 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "Abradilan Conexão Farma",
     sobre: "Evento da Associação Brasileira de Distribuição e Logística de Produtos Farmacêuticos (Abradilan) que reúne distribuidores, varejistas, indústrias e fornecedores.",
     segmento: "Setor Farmaceutico",
-    interessados: ["Lisa", "Carol", "Alice"],
+    interessados: [
+      { nome: "Lisa", intencao: "Prospecção" },
+      { nome: "Carol", intencao: "Network" },
+      { nome: "Alice", intencao: "Visita a Cliente Ativo" }
+    ],
     local: "Expo Center Norte",
     site: "https://www.abradilan.com.br/expositor-conexao-fa/",
     mes: "3 - março",
@@ -67,7 +71,10 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "AUTOCON",
     sobre: "É a maior feira de automação comercial da América Latina, funcionando como o principal evento anual para o setor de varejo.",
     segmento: "Tecnologia para Varejo / Automação Comercial",
-    interessados: ["Fernanda", "Lisa"],
+    interessados: [
+      { nome: "Fernanda", intencao: "Prospecção" },
+      { nome: "Lisa", intencao: "Outros" }
+    ],
     local: "São Paulo",
     site: "https://www.feiraautocom.com.br/",
     mes: "4 - abril",
@@ -79,7 +86,10 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "INTERMODAL SOUTH AMERICA",
     sobre: "É a principal e mais abrangente feira da América Latina para os setores de logística, intralogística, tecnologia, transporte de cargas e comércio exterior.",
     segmento: "Logística / Transporte / Portos",
-    interessados: ["Fernanda", "Lisa"],
+    interessados: [
+      { nome: "Fernanda", intencao: "Network" },
+      { nome: "Lisa", intencao: "PDI" }
+    ],
     local: "Anhembi, São Paulo",
     site: "https://www.intermodal.com.br/",
     mes: "4 - abril",
@@ -91,7 +101,10 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "APAS SHOW",
     sobre: "O APAS SHOW é a maior feira e congresso supermercadista do mundo, um evento anual que reúne toda a cadeia de valor do setor de alimentos e bebidas.",
     segmento: "Supermercados / Food & Retail",
-    interessados: ["Fernanda", "Lisa"],
+    interessados: [
+      { nome: "Fernanda", intencao: "Prospecção" },
+      { nome: "Lisa", intencao: "Visita a Cliente Ativo" }
+    ],
     local: "Expo Center Norte, São Paulo",
     site: "https://apasshow.com/",
     mes: "5 - maio",
@@ -103,7 +116,10 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "HOSPITALAR",
     sobre: "É a maior e mais influente feira de saúde da América Latina, um evento que reúne players do setor para gerar negócios.",
     segmento: "Saúde / Hospitalar",
-    interessados: ["Alice", "Carol"],
+    interessados: [
+      { nome: "Alice", intencao: "Prospecção" },
+      { nome: "Carol", intencao: "PDI" }
+    ],
     local: "São Paulo Expo",
     site: "https://www.hospitalar.com/",
     mes: "5 - maio",
@@ -115,7 +131,11 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "NATURALTECH",
     sobre: "É a maior feira de produtos orgânicos, naturais e sustentáveis da América Latina.",
     segmento: "Produtos Naturais / Saúde",
-    interessados: ["Lisa", "Alice", "Carol"],
+    interessados: [
+      { nome: "Lisa", intencao: "Network" },
+      { nome: "Alice", intencao: "Outros" },
+      { nome: "Carol", intencao: "Prospecção" }
+    ],
     local: "São Paulo Expo",
     site: "https://naturaltech.com.br/",
     mes: "6 - junho",
@@ -127,7 +147,11 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "FCE Pharma",
     sobre: "Considerada a maior feira da indústria farmacêutica na América Latina, reúne a cadeia de produção completa do setor.",
     segmento: "Setor Farmaceutico",
-    interessados: ["Roberta", "Alice", "Carol"],
+    interessados: [
+      { nome: "Roberta", intencao: "Visita a Cliente Ativo" },
+      { nome: "Alice", intencao: "PDI" },
+      { nome: "Carol", intencao: "Network" }
+    ],
     local: "São Paulo Expo",
     site: "https://fcepharma.com.br/",
     mes: "6 - junho",
@@ -139,7 +163,9 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "ABF FRANCHISING EXPO",
     sobre: "É a maior feira de franquias do mundo e o principal evento para quem busca oportunidades de negócio no setor de franchising.",
     segmento: "Franchising / Franquias",
-    interessados: ["Roberta"],
+    interessados: [
+      { nome: "Roberta", intencao: "Prospecção" }
+    ],
     local: "Expo Center Norte",
     site: "https://www.abfexpo.com.br/pt/a-feira.html",
     mes: "7 - julho",
@@ -151,7 +177,11 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "PET SOUTH AMERICA",
     sobre: "É um grande evento de negócios e o principal ponto de encontro da América Latina para o mercado pet e veterinário.",
     segmento: "Pet / Veterinária",
-    interessados: ["Lisa", "Carol", "Alice"],
+    interessados: [
+      { nome: "Lisa", intencao: "Outros" },
+      { nome: "Carol", intencao: "Prospecção" },
+      { nome: "Alice", intencao: "Visita a Cliente Ativo" }
+    ],
     local: "Anhembi / Expo",
     site: "https://home.petsa.com.br/",
     mes: "8 - agosto",
@@ -163,7 +193,9 @@ export const EVENTOS_DATA: Evento[] = [
     nome: "RD SUMMIT",
     sobre: "É o maior evento anual de marketing, vendas e e-commerce da América Latina, organizado pela RD Station.",
     segmento: "Marketing / Digital",
-    interessados: ["Lisa"],
+    interessados: [
+      { nome: "Lisa", intencao: "PDI" }
+    ],
     local: "Expo Center Norte",
     site: "https://rdsummit.rdstation.com/",
     mes: "11 - novembro",

@@ -1,10 +1,15 @@
 
+export interface Interessado {
+  nome: string;
+  intencao: string;
+}
+
 export interface Evento {
   id: string;
   nome: string;
   sobre: string;
   segmento: string;
-  interessados: string[];
+  interessados: Interessado[];
   local: string;
   site: string;
   mes: string;
