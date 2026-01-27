@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar';
 import EventCard from './components/EventCard';
 import { generateGoogleCalendarUrl, generateOutlookCalendarUrl } from './services/calendarService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import SegmentoChart from './components/SegmentoChart';
 import { supabase, isSupabaseConfigured } from './services/supabaseClient';
 
 const App: React.FC = () => {
@@ -72,6 +73,14 @@ const App: React.FC = () => {
     events.forEach(e => {
       const mesName = e.mes.split(' - ')[1];
       counts[mesName] = (counts[mesName] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [events]);
+
+  const segmentoData = useMemo(() => {
+    const counts: Record<string, number> = {};
+    events.forEach(e => {
+      counts[e.segmento] = (counts[e.segmento] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [events]);
@@ -247,7 +256,7 @@ const App: React.FC = () => {
             )}
 
             {view === ViewMode.STATS && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                   <h3 className="text-lg font-bold mb-6 text-slate-800">Eventos por Mês</h3>
                   <div className="h-64">
@@ -261,6 +270,11 @@ const App: React.FC = () => {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
+                </div>
+
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="text-lg font-bold mb-6 text-slate-800">Eventos por Segmento</h3>
+                  <SegmentoChart data={segmentoData} />
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
