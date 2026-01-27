@@ -103,16 +103,42 @@ const App: React.FC = () => {
     e.preventDefault();
     if (isEditMode && selectedEvent) {
       if (isSupabaseConfigured && supabase) {
-        await supabase.from('eventos').update(formEvent).eq('id', selectedEvent.id);
+        const { error } = await supabase.from('eventos').update(formEvent).eq('id', selectedEvent.id);
+        if (error) {
+          console.error("Error updating event in Supabase:", error);
+          alert("Erro ao atualizar evento no banco de dados. Verifique o console.");
+        }
       }
       setEvents(prev => prev.map(ev => ev.id === selectedEvent.id ? { ...ev, ...formEvent } as Evento : ev));
       setSelectedEvent({ ...selectedEvent, ...formEvent } as Evento);
       setIsEditMode(false);
     } else {
-      const eventToAdd = { ...formEvent, id: Date.now().toString(), interessados: [] } as Evento;
+      let eventToAdd: Evento;
+
       if (isSupabaseConfigured && supabase) {
-        await supabase.from('eventos').insert([eventToAdd]);
+        // Para Supabase, não enviamos ID se for autoincrement/uuid, ou geramos um UUID válido se necessário.
+        // Assumindo que o banco gera o UUID:
+        const payload = { ...formEvent, interessados: [] };
+        const { data, error } = await supabase.from('eventos').insert([payload]).select();
+
+        if (error) {
+          console.error("Error inserting event in Supabase:", error);
+          alert("Erro ao salvar evento no banco de dados: " + error.message);
+          return;
+        }
+
+        // Usa o objeto retornado pelo banco (com o ID correto)
+        if (data && data[0]) {
+          eventToAdd = data[0] as Evento;
+        } else {
+          // Fallback muito improvável
+          eventToAdd = { ...formEvent, id: Date.now().toString(), interessados: [] } as Evento;
+        }
+      } else {
+        // Modo Offline
+        eventToAdd = { ...formEvent, id: Date.now().toString(), interessados: [] } as Evento;
       }
+
       setEvents(prev => [...prev, eventToAdd]);
       setIsAddModalOpen(false);
     }
