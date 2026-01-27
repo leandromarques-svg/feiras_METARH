@@ -105,7 +105,15 @@ const App: React.FC = () => {
   }, []);
 
   const segmentos = useMemo(() => Array.from(new Set(events.map(e => e.segmento))), [events]);
-  const meses = useMemo(() => Array.from(new Set(events.map(e => e.mes))).sort(), [events]);
+  const meses = useMemo(() => {
+    const uniqueMeses = Array.from(new Set(events.map(e => e.mes)));
+    // Sort by month number (1 - janeiro, 2 - fevereiro, etc.)
+    return uniqueMeses.sort((a, b) => {
+      const numA = parseInt((a as string).split(' - ')[0]);
+      const numB = parseInt((b as string).split(' - ')[0]);
+      return numA - numB;
+    });
+  }, [events]);
   const interessados = useMemo(() => {
     const all = events.flatMap(e => e.interessados?.map(i => i.nome) || []);
     return Array.from(new Set(all));
@@ -614,7 +622,7 @@ const App: React.FC = () => {
                     </div>
 
                     <div>
-                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Time Responsável</h4>
+                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Participantes</h4>
                       <div className="flex flex-wrap gap-2 mb-6">
                         {selectedEvent.interessados && selectedEvent.interessados.length > 0 ? (
                           selectedEvent.interessados.map(interessado => (
