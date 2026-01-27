@@ -23,15 +23,16 @@ const DataManagementView: React.FC = () => {
             }
 
             // Basic validation (optional, can be improved)
+            // Mapeamento inteligente: Aceita tanto os nomes do banco quanto os nomes da planilha
             const validItems = dataToInsert.map(item => ({
-                nome: item.nome,
-                sobre: item.sobre || '',
-                segmento: item.segmento || 'Geral',
-                local: item.local || 'A definir',
-                site: item.site || '',
-                mes: item.mes || '1 - janeiro',
-                dia: item.dia || '01',
-                ano: item.ano || '2026',
+                nome: item.nome || item.Evento || item.evento,
+                sobre: item.sobre || item.Sobre || '',
+                segmento: item.segmento || item.Segmento || 'Geral',
+                local: item.local || item.Local || 'A definir',
+                site: item.site || item['Site do Evento'] || item.site_do_evento || '',
+                mes: item.mes || item['Mês'] || item.mes || '1 - janeiro',
+                dia: item.dia || item.Dia || item.dia ? String(item.dia || item.Dia) : '01',
+                ano: item.ano || item.Ano || item.ano ? String(item.ano || item.Ano) : '2026',
                 interessados: Array.isArray(item.interessados) ? item.interessados : []
             })).filter(item => item.nome); // Must have a name
 
@@ -64,12 +65,14 @@ const DataManagementView: React.FC = () => {
                 <p className="text-slate-600 text-sm">
                     Cole abaixo um JSON com uma lista de eventos para importar para o banco de dados.
                     <br />
-                    <span className="text-xs text-slate-400">Formato esperado: Array de objetos com campos nome, sobre, segmento, local, etc.</span>
+                    <span className="text-xs text-slate-400">
+                        Os dados podem estar com os nomes das colunas da sua planilha: "Evento", "Sobre", "Segmento", "Local", "Site do Evento", "Mês", "Dia", "Ano".
+                    </span>
                 </p>
 
                 <textarea
                     className="w-full h-64 p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-purple-500 outline-none"
-                    placeholder='[{"nome": "Evento Exemplo", "segmento": "Teste", ...}]'
+                    placeholder='[{"Evento": "Nome do Evento", "Sobre": "Descrição...", "Segmento": "TI", "Mês": "5 - maio" ...}]'
                     value={jsonInput}
                     onChange={(e) => setJsonInput(e.target.value)}
                 />
