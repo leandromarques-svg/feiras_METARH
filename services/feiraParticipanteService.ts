@@ -21,9 +21,10 @@ export interface Feira {
 export interface Participante {
   id?: string;
   nome: string;
+  area?: string;
 }
 
-// FEIRAS CRUD
+// FEIRAS CRUD (mantido)
 export const listarFeiras = async () => {
   const { data, error } = await supabase.from('feiras').select('*');
   if (error) throw error;
@@ -54,14 +55,14 @@ export const listarParticipantes = async () => {
   return data;
 };
 
-export const adicionarParticipante = async (nome: string) => {
-  const { data, error } = await supabase.from('participantes').insert([{ nome }]).select();
+export const adicionarParticipante = async (nome: string, area: string = '') => {
+  const { data, error } = await supabase.from('participantes').insert([{ nome, area }]).select();
   if (error) throw error;
   return data?.[0];
 };
 
-export const atualizarParticipante = async (id: string, nome: string) => {
-  const { data, error } = await supabase.from('participantes').update({ nome }).eq('id', id).select();
+export const atualizarParticipante = async (id: string, nome: string, area: string) => {
+  const { data, error } = await supabase.from('participantes').update({ nome, area }).eq('id', id).select();
   if (error) throw error;
   return data?.[0];
 };

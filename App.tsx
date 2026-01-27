@@ -453,19 +453,19 @@ const App: React.FC = () => {
         selectedEvent && !isEditMode && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             <div className="bg-white rounded-[2rem] w-full max-w-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto font-['Barlow']">
-              <div className="bg-purple-700 p-10 text-white relative">
-                <button onClick={() => setSelectedEvent(null)} className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors">
+              <div className="bg-purple-700 p-10 text-white relative bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                <button onClick={() => setSelectedEvent(null)} className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors bg-black/20 p-2 rounded-full hover:bg-black/40 backdrop-blur-sm">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
-                <div className="flex justify-between items-start">
-                  <span className="inline-block px-4 py-1.5 bg-white/20 rounded-full text-[10px] font-bold uppercase tracking-widest mb-5">{selectedEvent.segmento}</span>
-                  <button onClick={openEdit} className="mr-12 bg-white/10 hover:bg-white/30 p-2 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/20">
+                <div className="flex justify-between items-start mb-6">
+                  <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest border border-white/10 shadow-lg">{selectedEvent.segmento}</span>
+                  <button onClick={openEdit} className="mr-12 bg-white/10 hover:bg-white/30 p-2 rounded-lg transition-colors flex items-center gap-2 text-xs font-bold uppercase tracking-widest border border-white/20 backdrop-blur-sm">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                     Editar
                   </button>
                 </div>
-                <h3 className="text-4xl font-extrabold leading-none">{selectedEvent.nome}</h3>
-                <p className="mt-4 text-purple-100 flex items-center gap-2 font-bold uppercase tracking-widest text-xs">
+                <h3 className="text-4xl font-extrabold leading-none mb-2 tracking-tight">{selectedEvent.nome}</h3>
+                <p className="text-purple-100 flex items-center gap-2 font-bold uppercase tracking-widest text-xs opacity-80">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                   {selectedEvent.dia} de {selectedEvent.mes.split(' - ')[1]} de {selectedEvent.ano}
                 </p>
