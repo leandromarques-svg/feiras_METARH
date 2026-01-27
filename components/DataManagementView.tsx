@@ -3,54 +3,104 @@ import { supabase } from '../services/supabaseClient';
 
 const DataManagementView: React.FC = () => {
     const [jsonInput, setJsonInput] = useState('');
+    const [csvFile, setCsvFile] = useState<File | null>(null);
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
 
+    const parseCSV = (text: string) => {
+        const lines = text.split('\n').filter(l => l.trim());
+        if (lines.length < 2) return [];
+
+        // Detect separator
+        const headerLine = lines[0];
+        const separator = headerLine.includes(';') ? ';' : ',';
+
+        const headers = headerLine.split(separator).map(h => h.trim().replace(/^"|"$/g, ''));
+
+        return lines.slice(1).map(line => {
+            // Basic regex to handle specific cases, but a simple split is usually enough for simple CSVs
+            // This simple split does NOT handle delimiters inside quotes perfectly, but sufficient for this context
+            const values = line.split(separator).map(v => v.trim().replace(/^"|"$/g, ''));
+
+            const obj: any = {};
+            headers.forEach((h, i) => {
+                obj[h] = values[i];
+            });
+            return obj;
+        });
+    };
+
+    const processData = async (rawData: any[]) => {
+        // Mapeamento inteligente
+        const validItems = rawData.map(item => ({
+            nome: item.nome || item.Evento || item.evento,
+            sobre: item.sobre || item.Sobre || '',
+            segmento: item.segmento || item.Segmento || 'Geral',
+            local: item.local || item.Local || 'A definir',
+            site: item.site || item['Site do Evento'] || item.site_do_evento || '',
+            mes: item.mes || item['Mês'] || item.mes || '1 - janeiro',
+            dia: item.dia || item.Dia || item.dia ? String(item.dia || item.Dia) : '01',
+            ano: item.ano || item.Ano || item.ano ? String(item.ano || item.Ano) : '2026',
+            interessados: Array.isArray(item.interessados) ? item.interessados : []
+        })).filter(item => item.nome);
+
+        if (validItems.length === 0) {
+            throw new Error("Nenhum evento válido encontrado.");
+        }
+
+        if (!supabase) throw new Error("Supabase off.");
+
+        // Insert in batches if needed, but here simple insert
+        const { error } = await supabase.from('eventos').insert(validItems);
+        if (error) throw error;
+
+        return validItems.length;
+    };
+
     const handleImport = async () => {
-        if (!jsonInput.trim()) return;
+        if (!jsonInput.trim() && !csvFile) return;
 
         setStatus('loading');
         setMessage('');
 
         try {
-            const parsedData = JSON.parse(jsonInput);
+            let data: any[] = [];
 
-            // Ensure it's an array
-            const dataToInsert = Array.isArray(parsedData) ? parsedData : [parsedData];
-
-            if (!supabase) {
-                throw new Error("Supabase não está configurado.");
+            if (csvFile) {
+                const text = await csvFile.text();
+                // Simple check if it confuses JSON
+                if (text.trim().startsWith('[')) {
+                    data = JSON.parse(text);
+                } else {
+                    data = parseCSV(text);
+                }
+            } else {
+                // Try JSON first
+                try {
+                    data = JSON.parse(jsonInput);
+                } catch {
+                    // Try CSV if JSON fails
+                    data = parseCSV(jsonInput);
+                }
             }
 
-            // Basic validation (optional, can be improved)
-            // Mapeamento inteligente: Aceita tanto os nomes do banco quanto os nomes da planilha
-            const validItems = dataToInsert.map(item => ({
-                nome: item.nome || item.Evento || item.evento,
-                sobre: item.sobre || item.Sobre || '',
-                segmento: item.segmento || item.Segmento || 'Geral',
-                local: item.local || item.Local || 'A definir',
-                site: item.site || item['Site do Evento'] || item.site_do_evento || '',
-                mes: item.mes || item['Mês'] || item.mes || '1 - janeiro',
-                dia: item.dia || item.Dia || item.dia ? String(item.dia || item.Dia) : '01',
-                ano: item.ano || item.Ano || item.ano ? String(item.ano || item.Ano) : '2026',
-                interessados: Array.isArray(item.interessados) ? item.interessados : []
-            })).filter(item => item.nome); // Must have a name
+            // Normalize
+            if (!Array.isArray(data)) data = [data];
 
-            if (validItems.length === 0) {
-                throw new Error("Nenhum evento válido encontrado no JSON.");
-            }
-
-            const { error } = await supabase.from('eventos').insert(validItems);
-
-            if (error) throw error;
+            const count = await processData(data);
 
             setStatus('success');
-            setMessage(`${validItems.length} eventos importados com sucesso!`);
+            setMessage(`${count} eventos importados com sucesso!`);
             setJsonInput('');
+            setCsvFile(null);
+            // Reset file input value manually if needed, but handled by state mainly
+            const fileInput = document.getElementById('csvInput') as HTMLInputElement;
+            if (fileInput) fileInput.value = '';
+
         } catch (error: any) {
             console.error("Erro na importação:", error);
             setStatus('error');
-            setMessage(error.message || "Erro ao processar JSON. Verifique o formato.");
+            setMessage(error.message || "Erro ao processar dados.");
         }
     };
 
@@ -61,23 +111,50 @@ const DataManagementView: React.FC = () => {
                 Importação em Massa
             </h3>
 
-            <div className="space-y-4">
-                <p className="text-slate-600 text-sm">
-                    Cole abaixo um JSON com uma lista de eventos para importar para o banco de dados.
-                    <br />
-                    <span className="text-xs text-slate-400">
-                        Os dados podem estar com os nomes das colunas da sua planilha: "Evento", "Sobre", "Segmento", "Local", "Site do Evento", "Mês", "Dia", "Ano".
-                    </span>
-                </p>
+            <div className="space-y-6">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Opção 1: Upload de Arquivo (CSV ou JSON)</label>
+                    <input
+                        id="csvInput"
+                        type="file"
+                        accept=".csv,.json"
+                        className="block w-full text-sm text-slate-500
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-xs file:font-semibold
+                          file:bg-purple-50 file:text-purple-700
+                          hover:file:bg-purple-100
+                        "
+                        onChange={e => setCsvFile(e.target.files?.[0] || null)}
+                    />
+                    <p className="mt-2 text-xs text-slate-400">
+                        Suporta arquivos .csv (separado por vírgula ou ponto-e-vírgula) e .json.
+                    </p>
+                </div>
 
-                <textarea
-                    className="w-full h-64 p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-purple-500 outline-none"
-                    placeholder='[{"Evento": "Nome do Evento", "Sobre": "Descrição...", "Segmento": "TI", "Mês": "5 - maio" ...}]'
-                    value={jsonInput}
-                    onChange={(e) => setJsonInput(e.target.value)}
-                />
+                <div className="relative flex items-center">
+                    <div className="flex-grow border-t border-slate-200"></div>
+                    <span className="flex-shrink-0 mx-4 text-slate-300 text-xs font-bold uppercase">OU</span>
+                    <div className="flex-grow border-t border-slate-200"></div>
+                </div>
 
-                <div className="flex items-center justify-between">
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Opção 2: Colar Texto (JSON)</label>
+                    <textarea
+                        className="w-full h-32 p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-purple-500 outline-none"
+                        placeholder='[{"Evento": "Nome...", "Sobre": "..."}]'
+                        value={jsonInput}
+                        onChange={(e) => setJsonInput(e.target.value)}
+                    />
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <p className="text-xs text-blue-800">
+                        <strong>Colunas aceitas (CSV/JSON):</strong> Evento (ou nome), Sobre, Segmento, Local, Site do Evento (ou site), Mês, Dia, Ano.
+                    </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div className="flex-1">
                         {status === 'loading' && <span className="text-purple-600 font-bold text-sm animate-pulse">Processando...</span>}
                         {status === 'success' && <span className="text-emerald-500 font-bold text-sm">{message}</span>}
@@ -86,10 +163,10 @@ const DataManagementView: React.FC = () => {
 
                     <button
                         onClick={handleImport}
-                        disabled={status === 'loading' || !jsonInput.trim()}
+                        disabled={status === 'loading' || (!jsonInput.trim() && !csvFile)}
                         className="px-6 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Importar Eventos
+                        Importar Dados
                     </button>
                 </div>
             </div>
