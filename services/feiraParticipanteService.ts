@@ -1,3 +1,13 @@
+// Testa conexão com Supabase
+export const pingSupabase = async () => {
+  try {
+    const { error } = await supabase.from('feiras').select('*').limit(1);
+    if (error) throw error;
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
 import { supabase } from './supabaseClient';
 
 export interface Feira {
