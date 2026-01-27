@@ -1,3 +1,5 @@
+import { supabase } from './supabaseClient';
+
 // Testa conexão com Supabase
 export const pingSupabase = async () => {
   try {
@@ -8,7 +10,6 @@ export const pingSupabase = async () => {
     return false;
   }
 };
-import { supabase } from './supabaseClient';
 
 export interface Feira {
   id?: string;
