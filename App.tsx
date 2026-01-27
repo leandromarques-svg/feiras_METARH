@@ -594,10 +594,11 @@ const App: React.FC = () => {
                       <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Time Responsável</h4>
                       <div className="flex flex-wrap gap-2 mb-6">
                         {selectedEvent.interessados && selectedEvent.interessados.length > 0 ? (
-                          selectedEvent.interessados.map(nome => (
-                            <span key={nome} className="group flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-800 rounded-xl text-xs font-bold border border-purple-100 shadow-sm">
-                              {nome}
-                              <button onClick={() => removeParticipant(selectedEvent.id, nome)} className="text-purple-300 hover:text-red-500 transition-colors">
+                          selectedEvent.interessados.map(interessado => (
+                            <span key={interessado.nome} className="group flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-800 rounded-xl text-xs font-bold border border-purple-100 shadow-sm">
+                              <span>{interessado.nome}</span>
+                              <span className="text-[10px] text-purple-500 font-normal">({interessado.intencao})</span>
+                              <button onClick={() => removeParticipant(selectedEvent.id, interessado.nome)} className="text-purple-300 hover:text-red-500 transition-colors">
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                               </button>
                             </span>
