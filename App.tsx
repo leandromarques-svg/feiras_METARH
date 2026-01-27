@@ -272,10 +272,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="text-lg font-bold mb-6 text-slate-800">Eventos por Segmento</h3>
-                  <SegmentoChart data={segmentoData} />
-                </div>
+
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
                   <h3 className="text-lg font-bold mb-6 text-slate-800">Ranking do Time</h3>
