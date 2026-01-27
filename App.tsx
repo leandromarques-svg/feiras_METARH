@@ -13,7 +13,19 @@ import ParticipantsView from './components/ParticipantsView';
 import DataManagementView from './components/DataManagementView';
 
 const App: React.FC = () => {
-  const [events, setEvents] = useState<Evento[]>(EVENTOS_DATA);
+  // Initialize with sanitized data
+  const initialEvents = EVENTOS_DATA.map(event => ({
+    ...event,
+    interessados: Array.isArray(event.interessados)
+      ? event.interessados.map((i: any) => {
+        if (typeof i === 'object' && i.nome) return i;
+        if (typeof i === 'string') return { nome: i, intencao: 'Outros' };
+        return { nome: String(i), intencao: 'Outros' };
+      })
+      : []
+  }));
+
+  const [events, setEvents] = useState<Evento[]>(initialEvents);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'error'>('checking');
   const [view, setView] = useState<ViewMode>(ViewMode.GRID);
@@ -64,7 +76,18 @@ const App: React.FC = () => {
         ]);
 
         if (!eventsResult.error && eventsResult.data && eventsResult.data.length > 0) {
-          setEvents(eventsResult.data);
+          // Sanitize data to ensure interessados is always in correct format
+          const sanitizedEvents = eventsResult.data.map((event: any) => ({
+            ...event,
+            interessados: Array.isArray(event.interessados)
+              ? event.interessados.map((i: any) => {
+                if (typeof i === 'object' && i.nome) return i;
+                if (typeof i === 'string') return { nome: i, intencao: 'Outros' };
+                return { nome: String(i), intencao: 'Outros' };
+              })
+              : []
+          }));
+          setEvents(sanitizedEvents);
         }
 
         if (participantsResult) {
