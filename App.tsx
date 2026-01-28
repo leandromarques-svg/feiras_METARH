@@ -130,14 +130,43 @@ const App: React.FC = () => {
   }, [events]);
 
   const filteredEvents = useMemo(() => {
-    return events.filter(e => {
-      const matchSearch = e.nome.toLowerCase().includes(filters.search.toLowerCase()) ||
-        e.sobre.toLowerCase().includes(filters.search.toLowerCase());
-      const matchSegmento = !filters.segmento || e.segmento === filters.segmento;
-      const matchMes = !filters.mes || e.mes === filters.mes;
-      const matchInteressado = !filters.interessado || (e.interessados && e.interessados.some(i => i.nome === filters.interessado));
-      return matchSearch && matchSegmento && matchMes && matchInteressado;
-    });
+    const mesesOrdem = [
+      '1 - janeiro',
+      '2 - fevereiro',
+      '3 - março',
+      '4 - abril',
+      '5 - maio',
+      '6 - junho',
+      '7 - julho',
+      '8 - agosto',
+      '9 - setembro',
+      '10 - outubro',
+      '11 - novembro',
+      '12 - dezembro',
+    ];
+    return events
+      .filter(e => {
+        const matchSearch = e.nome.toLowerCase().includes(filters.search.toLowerCase()) ||
+          e.sobre.toLowerCase().includes(filters.search.toLowerCase());
+        const matchSegmento = !filters.segmento || e.segmento === filters.segmento;
+        const matchMes = !filters.mes || e.mes === filters.mes;
+        const matchInteressado = !filters.interessado || (e.interessados && e.interessados.some(i => i.nome === filters.interessado));
+        return matchSearch && matchSegmento && matchMes && matchInteressado;
+      })
+      .sort((a, b) => {
+        // Ano
+        const anoA = parseInt(a.ano);
+        const anoB = parseInt(b.ano);
+        if (anoA !== anoB) return anoA - anoB;
+        // Mês
+        const mesA = mesesOrdem.indexOf(a.mes);
+        const mesB = mesesOrdem.indexOf(b.mes);
+        if (mesA !== mesB) return mesA - mesB;
+        // Dia (pega o primeiro número do campo dia)
+        const diaA = parseInt((a.dia.match(/\d+/) || ['0'])[0]);
+        const diaB = parseInt((b.dia.match(/\d+/) || ['0'])[0]);
+        return diaA - diaB;
+      });
   }, [filters, events]);
 
   const statsData = useMemo(() => {
@@ -653,9 +682,11 @@ const App: React.FC = () => {
                       <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Adicionar ao meu Calendário</h4>
                       <div className="flex gap-3">
                         <a href={generateGoogleCalendarUrl(selectedEvent)} target="_blank" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-purple-200 hover:bg-purple-50 transition-all shadow-sm">
+                          <svg className="w-5 h-5" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M43.611 20.083H42V20H24v8h11.303C33.978 32.708 29.418 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c2.73 0 5.24.936 7.225 2.488l6.084-6.084C33.527 5.099 28.973 3 24 3 12.954 3 4 11.954 4 23s8.954 20 20 20c10.998 0 19.837-7.998 19.837-20 0-1.341-.138-2.359-.226-2.917z"/><path fill="#34A853" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.001 13 24 13c2.73 0 5.24.936 7.225 2.488l6.084-6.084C33.527 5.099 28.973 3 24 3c-7.732 0-14.41 4.41-17.694 10.691z"/><path fill="#FBBC05" d="M24 43c5.356 0 10.13-1.824 13.857-4.963l-6.392-5.238C29.418 36 24 36 24 36c-5.393 0-9.941-3.282-11.293-7.708l-6.57 5.073C9.59 38.59 16.268 43 24 43z"/><path fill="#EA4335" d="M43.611 20.083H42V20H24v8h11.303c-1.13 3.02-4.303 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c2.73 0 5.24.936 7.225 2.488l6.084-6.084C33.527 5.099 28.973 3 24 3c-7.732 0-14.41 4.41-17.694 10.691l6.571 4.819C14.655 16.108 19.001 13 24 13c2.73 0 5.24.936 7.225 2.488l6.084-6.084C33.527 5.099 28.973 3 24 3c-7.732 0-14.41 4.41-17.694 10.691z"/></g></svg>
                           Google
                         </a>
                         <a href={generateOutlookCalendarUrl(selectedEvent)} target="_blank" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:border-purple-200 hover:bg-purple-50 transition-all shadow-sm">
+                          <svg className="w-5 h-5" viewBox="0 0 48 48"><g><rect width="36" height="36" x="6" y="6" fill="#1976D2" rx="3"/><path fill="#fff" d="M34 16H14a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V18a2 2 0 0 0-2-2zm0 2v2.5l-10 6.25-10-6.25V18h20zm-20 12v-7.5l10 6.25 10-6.25V30H14z"/></g></svg>
                           Outlook
                         </a>
                       </div>
