@@ -65,22 +65,19 @@ const App: React.FC = () => {
     const checkStatus = async () => {
       if (!isSupabaseConfigured) {
         setConnectionStatus('error');
-        if (!usuarioLogado) {
-          const LoginView = require('./components/LoginView').default;
-          return <LoginView />;
-        }
-
-        return (
-          <div className="App">
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 16 }}>
-              <span style={{ marginRight: 16 }}>Perfil: {usuarioLogado.perfil}</span>
-              <button onClick={handleLogout} style={{ padding: '8px 16px', borderRadius: 8, background: '#eee', fontWeight: 'bold' }}>Sair</button>
-            </div>
-            {/* ...restante do app... */}
-            {/* ...código existente... */}
-          </div >
-        );
+        return;
+      }
+      const isConnected = await pingSupabase();
+      setConnectionStatus(isConnected ? 'connected' : 'error');
+    };
+    checkStatus();
   }, []);
+  // Exibe tela de login se não estiver autenticado
+  if (!usuarioLogado) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const LoginView = require('./components/LoginView').default;
+    return <LoginView />;
+  }
 
   // Fetch from Supabase ou mantém constantes
   useEffect(() => {
