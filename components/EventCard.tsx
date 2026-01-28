@@ -11,6 +11,17 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ evento, onClick, isSelectionMode, isSelected, onToggleSelect }) => {
+    // Função para determinar se o evento já passou
+    const isPast = (() => {
+      const today = new Date();
+      const year = parseInt(evento.ano);
+      const month = parseInt(evento.mes.split(' - ')[0]) - 1;
+      // Pega o último número do campo dia (ex: "10 a 12" => 12)
+      const dias = evento.dia.match(/\d+/g);
+      const day = dias && dias.length > 0 ? parseInt(dias[dias.length - 1]) : 1;
+      const eventDate = new Date(year, month, day, 23, 59, 59);
+      return eventDate < today;
+    })();
   const handleClick = () => {
     if (isSelectionMode && onToggleSelect) {
       onToggleSelect(evento.id);
@@ -22,10 +33,10 @@ const EventCard: React.FC<EventCardProps> = ({ evento, onClick, isSelectionMode,
   return (
     <div
       onClick={handleClick}
-      className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-5 border cursor-pointer group flex flex-col justify-between relative ${isSelected
-          ? 'border-purple-500 ring-2 ring-purple-100 bg-purple-50/10'
-          : 'border-slate-200'
-        }`}
+      className={`rounded-xl shadow-sm transition-all p-5 border cursor-pointer group flex flex-col justify-between relative
+        ${isSelected ? 'border-purple-500 ring-2 ring-purple-100 bg-purple-50/10' : 'border-slate-200'}
+        ${isPast ? 'bg-slate-100 text-slate-400 opacity-70 hover:shadow-none hover:bg-slate-100 cursor-default' : 'bg-white hover:shadow-md'}
+      `}
     >
       {isSelectionMode && (
         <div className="absolute top-4 right-4 z-10">
