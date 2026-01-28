@@ -107,12 +107,22 @@ const App: React.FC = () => {
   const segmentos = useMemo(() => Array.from(new Set(events.map(e => e.segmento))), [events]);
   const meses = useMemo(() => {
     const uniqueMeses = Array.from(new Set(events.map(e => e.mes)));
-    // Sort by month number (1 - janeiro, 2 - fevereiro, etc.)
-    return uniqueMeses.sort((a, b) => {
-      const numA = parseInt((a as string).split(' - ')[0]);
-      const numB = parseInt((b as string).split(' - ')[0]);
-      return numA - numB;
-    });
+    // Ordenação correta dos meses (Janeiro a Dezembro)
+    const mesesOrdem = [
+      '1 - janeiro',
+      '2 - fevereiro',
+      '3 - março',
+      '4 - abril',
+      '5 - maio',
+      '6 - junho',
+      '7 - julho',
+      '8 - agosto',
+      '9 - setembro',
+      '10 - outubro',
+      '11 - novembro',
+      '12 - dezembro',
+    ];
+    return mesesOrdem.filter(m => uniqueMeses.includes(m));
   }, [events]);
   const interessados = useMemo(() => {
     const all = events.flatMap(e => e.interessados?.map(i => i.nome) || []);
@@ -414,7 +424,7 @@ const App: React.FC = () => {
                     if (eventsInMonth.length === 0) return null;
                     return (
                       <div key={m}>
-                        <h4 className="text-xl font-bold text-slate-800 border-l-4 border-purple-500 pl-4 mb-5 uppercase tracking-wider">
+                        <h4 className="text-xl font-extrabold text-purple-700 border-l-4 border-purple-500 pl-4 mb-5 uppercase tracking-wider">
                           {m.split(' - ')[1]}
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
