@@ -357,7 +357,7 @@ const App: React.FC = () => {
     <div className="flex min-h-screen" style={{ background: '#f7f6fa', fontFamily: 'Barlow, sans-serif' }}>
       <Sidebar activeView={view} onViewChange={setView} connectionStatus={connectionStatus} />
 
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 p-8">
         <header className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-3xl font-extrabold" style={{ color: '#3F2666', letterSpacing: '-0.01em' }}>
