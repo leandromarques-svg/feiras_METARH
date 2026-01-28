@@ -13,7 +13,7 @@ import ParticipantsView from './components/ParticipantsView';
 import DataManagementView from './components/DataManagementView';
 
 const App: React.FC = () => {
-  // Initialize with sanitized data
+  // ...existing code...
   const initialEvents = EVENTOS_DATA.map(event => ({
     ...event,
     interessados: Array.isArray(event.interessados)
@@ -39,6 +39,19 @@ const App: React.FC = () => {
   const [newIntention, setNewIntention] = useState('');
   const [allParticipants, setAllParticipants] = useState<Participante[]>([]);
 
+  // Autenticação simples
+  const [usuarioLogado, setUsuarioLogado] = useState(() => {
+    const user = localStorage.getItem('usuario');
+    return user ? JSON.parse(user) : null;
+  });
+
+  // Função para logout
+  const handleLogout = () => {
+    localStorage.removeItem('usuario');
+    setUsuarioLogado(null);
+    window.location.reload();
+  };
+
   // Selection Mode State
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -52,12 +65,21 @@ const App: React.FC = () => {
     const checkStatus = async () => {
       if (!isSupabaseConfigured) {
         setConnectionStatus('error');
-        return;
-      }
-      const isConnected = await pingSupabase();
-      setConnectionStatus(isConnected ? 'connected' : 'error');
-    };
-    checkStatus();
+        if (!usuarioLogado) {
+          const LoginView = require('./components/LoginView').default;
+          return <LoginView />;
+        }
+
+        return (
+          <div className="App">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 16 }}>
+              <span style={{ marginRight: 16 }}>Perfil: {usuarioLogado.perfil}</span>
+              <button onClick={handleLogout} style={{ padding: '8px 16px', borderRadius: 8, background: '#eee', fontWeight: 'bold' }}>Sair</button>
+            </div>
+            {/* ...restante do app... */}
+            {/* ...código existente... */}
+          </div >
+        );
   }, []);
 
   // Fetch from Supabase ou mantém constantes
