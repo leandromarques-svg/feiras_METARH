@@ -39,18 +39,6 @@ const App: React.FC = () => {
   const [newIntention, setNewIntention] = useState('');
   const [allParticipants, setAllParticipants] = useState<Participante[]>([]);
 
-  // Autenticação simples
-  const [usuarioLogado, setUsuarioLogado] = useState(() => {
-    const user = localStorage.getItem('usuario');
-    return user ? JSON.parse(user) : null;
-  });
-
-  // Função para logout
-  const handleLogout = () => {
-    localStorage.removeItem('usuario');
-    setUsuarioLogado(null);
-    window.location.reload();
-  };
 
   // Selection Mode State
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -72,12 +60,7 @@ const App: React.FC = () => {
     };
     checkStatus();
   }, []);
-  // Exibe tela de login se não estiver autenticado
-  if (!usuarioLogado) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const LoginView = require('./components/LoginView').default;
-    return <LoginView />;
-  }
+  // ...autenticação removida, acesso livre...
 
   // Fetch from Supabase ou mantém constantes
   useEffect(() => {
