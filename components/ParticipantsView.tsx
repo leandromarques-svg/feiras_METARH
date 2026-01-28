@@ -65,17 +65,10 @@ const ParticipantsView: React.FC = () => {
                 <form onSubmit={handleAdd} className="flex-1 flex gap-2">
                     <input
                         type="text"
-                        placeholder="Nome..."
-                        className="flex-[2] px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 font-medium"
+                        placeholder="Nome do participante..."
+                        className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 font-medium"
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Área (Ex: Comercial)"
-                        className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500 font-medium"
-                        value={newArea}
-                        onChange={(e) => setNewArea(e.target.value)}
                     />
                     <button
                         type="submit"
@@ -99,10 +92,7 @@ const ParticipantsView: React.FC = () => {
                                 <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">
                                     {p.nome.charAt(0).toUpperCase()}
                                 </div>
-                                <div>
-                                    <div className="font-bold text-slate-700">{p.nome}</div>
-                                    <div className="text-xs text-slate-400 font-medium">{p.area || 'Sem área'}</div>
-                                </div>
+                                <span className="font-bold text-slate-700">{p.nome}</span>
                             </div>
                             <button
                                 onClick={() => handleDelete(p.id!)}

@@ -449,17 +449,19 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="text-lg font-bold mb-6 text-slate-800">Motivos de Participação</h3>
+                  <h3 className="text-lg font-bold mb-6 text-slate-800">Participantes por Evento</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={(() => {
-                        const intencoes: Record<string, number> = {};
+                        const participantCounts: Record<string, number> = {};
                         events.forEach(e => {
                           e.interessados?.forEach(i => {
-                            intencoes[i.intencao] = (intencoes[i.intencao] || 0) + 1;
+                            participantCounts[i.nome] = (participantCounts[i.nome] || 0) + 1;
                           });
                         });
-                        return Object.entries(intencoes).map(([name, value]) => ({ name, value }));
+                        return Object.entries(participantCounts)
+                          .map(([name, value]) => ({ name, value }))
+                          .sort((a, b) => b.value - a.value);
                       })()}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <XAxis dataKey="name" angle={-15} textAnchor="end" height={80} />
@@ -649,7 +651,6 @@ const App: React.FC = () => {
                           selectedEvent.interessados.map(interessado => (
                             <span key={interessado.nome} className="group flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-800 rounded-xl text-xs font-bold border border-purple-100 shadow-sm">
                               <span>{interessado.nome}</span>
-                              <span className="text-[10px] text-purple-500 font-normal">({interessado.intencao})</span>
                               <button onClick={() => removeParticipant(selectedEvent.id, interessado.nome)} className="text-purple-300 hover:text-red-500 transition-colors">
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                               </button>
@@ -660,46 +661,31 @@ const App: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-3">
-                        <div className="flex gap-2">
-                          <select
-                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
-                            value={newParticipantName}
-                            onChange={e => setNewParticipantName(e.target.value)}
-                          >
-                            <option value="">Selecione um integrante...</option>
-                            {allParticipants
-                              .filter(p => !selectedEvent.interessados?.some(i => i.nome === p.nome))
-                              .map(p => (
-                                <option key={p.id} value={p.nome}>{p.nome}</option>
-                              ))
-                            }
-                          </select>
-                          <select
-                            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
-                            value={newIntention}
-                            onChange={e => setNewIntention(e.target.value)}
-                          >
-                            <option value="">Intenção...</option>
-                            <option value="Visita a Cliente Ativo">Visita a Cliente Ativo</option>
-                            <option value="Prospecção">Prospecção</option>
-                            <option value="PDI">PDI</option>
-                            <option value="Network">Network</option>
-                            <option value="Outros">Outros</option>
-                          </select>
-                        </div>
+                      <div className="flex gap-2">
+                        <select
+                          className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-purple-500 font-medium appearance-none"
+                          value={newParticipantName}
+                          onChange={e => setNewParticipantName(e.target.value)}
+                        >
+                          <option value="">Selecione um participante...</option>
+                          {allParticipants
+                            .filter(p => !selectedEvent.interessados?.some(i => i.nome === p.nome))
+                            .map(p => (
+                              <option key={p.id} value={p.nome}>{p.nome}</option>
+                            ))
+                          }
+                        </select>
                         <button
                           onClick={() => {
-                            if (newParticipantName && newIntention) {
-                              addParticipant(selectedEvent.id, newParticipantName, newIntention);
+                            if (newParticipantName) {
+                              addParticipant(selectedEvent.id, newParticipantName, 'Participante');
                               setNewParticipantName('');
-                              setNewIntention('');
                             }
                           }}
-                          disabled={!newParticipantName || !newIntention}
-                          className="w-full px-6 py-3 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!newParticipantName}
+                          className="px-6 py-3 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Incluir Responsável
+                          Incluir
                         </button>
                       </div>
                     </div>
