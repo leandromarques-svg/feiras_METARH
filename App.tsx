@@ -354,18 +354,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-['Barlow'] antialiased">
+    <div className="flex min-h-screen" style={{ background: '#f7f6fa', fontFamily: 'Barlow, sans-serif' }}>
       <Sidebar activeView={view} onViewChange={setView} connectionStatus={connectionStatus} />
 
       <main className="flex-1 ml-64 p-8">
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-3xl font-extrabold" style={{ color: '#3F2666', letterSpacing: '-0.01em' }}>
               {view === ViewMode.GRID && 'Eventos Disponíveis'}
               {view === ViewMode.CALENDAR && 'Cronograma 2026'}
               {view === ViewMode.STATS && 'Insights de Prospecção'}
             </h2>
-            <p className="text-slate-500 mt-1 font-medium italic">Gestão colaborativa do time comercial.</p>
+            <p className="mt-1 font-medium italic" style={{ color: '#3F2666', opacity: 0.7 }}>Gestão colaborativa do time comercial.</p>
           </div>
 
           <div className="flex space-x-3 items-center">
@@ -377,7 +377,7 @@ const App: React.FC = () => {
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               />
-              <svg className="w-5 h-5 absolute left-3 top-2.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 absolute left-3 top-2.5" style={{ color: '#3F2666', opacity: 0.5 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
@@ -386,8 +386,8 @@ const App: React.FC = () => {
               <button
                 onClick={toggleSelectionMode}
                 className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm border ${isSelectionMode
-                  ? 'bg-slate-200 text-slate-700 border-slate-300'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#ede9f7] text-[#3F2666] border-[#cfc1e6]'
+                  : 'bg-white text-[#3F2666] border-[#e5e0f0] hover:bg-[#f7f6fa]'
                   }`}
               >
                 {isSelectionMode ? 'Cancelar Seleção' : 'Selecionar'}
@@ -407,7 +407,7 @@ const App: React.FC = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Sincronizando banco de dados...</p>
+            <p className="font-bold uppercase tracking-widest text-xs" style={{ color: '#3F2666', opacity: 0.7 }}>Sincronizando banco de dados...</p>
           </div>
         ) : (
           <>
@@ -415,7 +415,7 @@ const App: React.FC = () => {
               <>
                 <div className="flex flex-wrap gap-4 mb-8">
                   <select
-                    className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
+                    className="bg-white border border-[#e5e0f0] rounded-lg px-3 py-2 text-sm text-[#3F2666] focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
                     value={filters.segmento}
                     onChange={(e) => setFilters(prev => ({ ...prev, segmento: e.target.value }))}
                   >
@@ -424,7 +424,7 @@ const App: React.FC = () => {
                   </select>
 
                   <select
-                    className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
+                    className="bg-white border border-[#e5e0f0] rounded-lg px-3 py-2 text-sm text-[#3F2666] focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
                     value={filters.mes}
                     onChange={(e) => setFilters(prev => ({ ...prev, mes: e.target.value }))}
                   >
@@ -433,7 +433,7 @@ const App: React.FC = () => {
                   </select>
 
                   <select
-                    className="bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
+                    className="bg-white border border-[#e5e0f0] rounded-lg px-3 py-2 text-sm text-[#3F2666] focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm font-medium"
                     value={filters.interessado}
                     onChange={(e) => setFilters(prev => ({ ...prev, interessado: e.target.value }))}
                   >
@@ -469,10 +469,10 @@ const App: React.FC = () => {
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                           {eventsInMonth.map(e => (
-                            <div key={e.id} className="p-5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center group hover:bg-white hover:shadow-md transition-all">
+                            <div key={e.id} className="p-5 bg-[#f7f6fa] rounded-xl border border-[#e5e0f0] flex justify-between items-center group hover:bg-white hover:shadow-md transition-all">
                               <div>
-                                <p className="font-bold text-slate-800 text-lg">{e.nome}</p>
-                                <p className="text-xs text-slate-500 font-bold uppercase tracking-tight">{e.dia} de {e.mes.split(' - ')[1]}</p>
+                                <p className="font-bold" style={{ color: '#3F2666', fontSize: '1.125rem' }}>{e.nome}</p>
+                                <p className="text-xs font-bold uppercase tracking-tight" style={{ color: '#3F2666', opacity: 0.7 }}>{e.dia} de {e.mes.split(' - ')[1]}</p>
                               </div>
                               <button onClick={() => setSelectedEvent(e)} className="bg-purple-50 text-purple-600 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -490,7 +490,7 @@ const App: React.FC = () => {
             {view === ViewMode.STATS && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="text-lg font-bold mb-6 text-slate-800">Eventos por Mês</h3>
+                  <h3 className="text-lg font-bold mb-6" style={{ color: '#3F2666' }}>Eventos por Mês</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={statsData}>
@@ -505,7 +505,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="text-lg font-bold mb-6 text-slate-800">Participantes por Evento</h3>
+                  <h3 className="text-lg font-bold mb-6" style={{ color: '#3F2666' }}>Participantes por Evento</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={(() => {
@@ -530,7 +530,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
-                  <h3 className="text-lg font-bold mb-6 text-slate-800">Ranking do Time</h3>
+                  <h3 className="text-lg font-bold mb-6" style={{ color: '#3F2666' }}>Ranking do Time</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {interessados.map(nome => {
                       const count = events.filter(e => e.interessados && e.interessados.some(i => i.nome === nome)).length;
@@ -538,10 +538,10 @@ const App: React.FC = () => {
                       return (
                         <div key={nome}>
                           <div className="flex justify-between text-sm mb-2">
-                            <span className="font-bold text-slate-700">{nome}</span>
+                            <span className="font-bold" style={{ color: '#3F2666' }}>{nome}</span>
                             <span className="text-purple-600 font-bold">{count} feiras</span>
                           </div>
-                          <div className="w-full bg-slate-100 rounded-full h-3">
+                          <div className="w-full" style={{ background: '#e5e0f0', borderRadius: '9999px', height: '0.75rem' }}>
                             <div className="bg-purple-600 h-3 rounded-full transition-all duration-500" style={{ width: `${percentage}%` }}></div>
                           </div>
                         </div>
@@ -566,8 +566,8 @@ const App: React.FC = () => {
       {/* Floating Action Bar for Bulk Delete */}
       {selectedIds.size > 0 && isSelectionMode && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-full shadow-2xl border border-slate-200 z-50 flex items-center gap-4 animate-in slide-in-from-bottom-4">
-          <span className="font-bold text-slate-700">{selectedIds.size} selecionado(s)</span>
-          <div className="h-6 w-px bg-slate-200"></div>
+          <span className="font-bold" style={{ color: '#3F2666' }}>{selectedIds.size} selecionado(s)</span>
+          <div className="h-6 w-px" style={{ background: '#e5e0f0' }}></div>
           <button
             onClick={handleBulkDelete}
             className="flex items-center gap-2 text-red-500 font-bold hover:text-red-600 transition-colors"
@@ -581,29 +581,29 @@ const App: React.FC = () => {
       {/* Modal Cadastro/Edição */}
       {
         (isAddModalOpen || isEditMode) && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="fixed inset-0" style={{ background: 'rgba(63,38,102,0.6)' }}>
             <div className="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden p-8 animate-in slide-in-from-bottom-4 duration-200">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-slate-800">{isEditMode ? 'Editar Evento' : 'Cadastrar Novo Evento'}</h3>
-                <button onClick={() => { setIsAddModalOpen(false); setIsEditMode(false); }} className="text-slate-400 hover:text-slate-600">
+                <h3 className="text-2xl font-bold" style={{ color: '#3F2666' }}>{isEditMode ? 'Editar Evento' : 'Cadastrar Novo Evento'}</h3>
+                <button onClick={() => { setIsAddModalOpen(false); setIsEditMode(false); }} style={{ color: '#b3a0d1' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
               <form onSubmit={handleSaveEvent} className="space-y-4 font-['Barlow']">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Nome do Evento</label>
-                    <input required type="text" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Nome do Evento</label>
+                    <input required type="text" className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.nome} onChange={e => setFormEvent({ ...formEvent, nome: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Segmento</label>
-                    <input required type="text" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Segmento</label>
+                    <input required type="text" className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.segmento} onChange={e => setFormEvent({ ...formEvent, segmento: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Mês</label>
-                    <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Mês</label>
+                    <select className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.mes} onChange={e => setFormEvent({ ...formEvent, mes: e.target.value })}>
                       <option value="1 - janeiro">Janeiro</option>
                       <option value="2 - fevereiro">Fevereiro</option>
@@ -620,18 +620,18 @@ const App: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Dias</label>
-                    <input placeholder="Ex: 10 a 12" required type="text" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Dias</label>
+                    <input placeholder="Ex: 10 a 12" required type="text" className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.dia} onChange={e => setFormEvent({ ...formEvent, dia: e.target.value })} />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Local</label>
-                    <input required type="text" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Local</label>
+                    <input required type="text" className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.local} onChange={e => setFormEvent({ ...formEvent, local: e.target.value })} />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Sobre o Evento</label>
-                    <textarea required rows={3} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none font-medium"
+                    <label className="block text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: '#3F2666', opacity: 0.7 }}>Sobre o Evento</label>
+                    <textarea required rows={3} className="w-full px-4 py-3" style={{ background: '#f7f6fa', border: '1px solid #e5e0f0', borderRadius: '0.75rem', fontWeight: 500 }}
                       value={formEvent.sobre} onChange={e => setFormEvent({ ...formEvent, sobre: e.target.value })} />
                   </div>
                   <div className="col-span-2">

@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeView, onViewChange, connectionS
   ];
 
   return (
-    <aside className="w-64 bg-slate-900 text-white flex flex-col h-screen fixed left-0 top-0 z-50 border-r border-slate-800 font-['Barlow']">
+    <aside className="w-64" style={{ background: '#3F2666', color: 'white', borderRight: '1px solid #2a1847', fontFamily: 'Barlow, sans-serif' }}>
       <div className="p-8 flex flex-col items-start">
         <div className="mb-4">
           <Logo />
