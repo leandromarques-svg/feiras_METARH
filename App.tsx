@@ -131,12 +131,18 @@ const App: React.FC = () => {
   }, [filters, events]);
 
   const statsData = useMemo(() => {
-    const counts: Record<string, number> = {};
+    const counts: Record<string, { num: number, count: number }> = {};
     events.forEach(e => {
+      const mesNum = parseInt(e.mes.split(' - ')[0]);
       const mesName = e.mes.split(' - ')[1];
-      counts[mesName] = (counts[mesName] || 0) + 1;
+      if (!counts[mesName]) {
+        counts[mesName] = { num: mesNum, count: 0 };
+      }
+      counts[mesName].count++;
     });
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    return Object.entries(counts)
+      .map(([name, data]) => ({ name, value: data.count, num: data.num }))
+      .sort((a, b) => a.num - b.num);
   }, [events]);
 
   const segmentoData = useMemo(() => { // Keep this for future if used
