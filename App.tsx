@@ -141,18 +141,29 @@ const App: React.FC = () => {
   }, [filters, events]);
 
   const statsData = useMemo(() => {
-    const counts: Record<string, { num: number, count: number }> = {};
+    const mesesOrdem = [
+      '1 - janeiro',
+      '2 - fevereiro',
+      '3 - março',
+      '4 - abril',
+      '5 - maio',
+      '6 - junho',
+      '7 - julho',
+      '8 - agosto',
+      '9 - setembro',
+      '10 - outubro',
+      '11 - novembro',
+      '12 - dezembro',
+    ];
+    const counts: Record<string, number> = {};
     events.forEach(e => {
-      const mesNum = parseInt(e.mes.split(' - ')[0]);
-      const mesName = e.mes.split(' - ')[1];
-      if (!counts[mesName]) {
-        counts[mesName] = { num: mesNum, count: 0 };
-      }
-      counts[mesName].count++;
+      const mes = e.mes;
+      if (!counts[mes]) counts[mes] = 0;
+      counts[mes]++;
     });
-    return Object.entries(counts)
-      .map(([name, data]) => ({ name, value: data.count, num: data.num }))
-      .sort((a, b) => a.num - b.num);
+    return mesesOrdem
+      .filter(m => counts[m])
+      .map(m => ({ name: m.split(' - ')[1], value: counts[m] }));
   }, [events]);
 
   const segmentoData = useMemo(() => { // Keep this for future if used
